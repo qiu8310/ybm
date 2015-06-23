@@ -214,11 +214,44 @@ ybm.suite = function (bmTests, runOptions) {
 
 /**
  *
+ * Cycle running some test suite. 
+ *
+ * @param {Number} times
+ * @param {Array|Object} suite
+ * @param {Object} [suiteOptions]
+ * @param {Function} [done]
+ */
+ybm.cycle = function (times, suite, suiteOptions, done) {
+  if (_lodash2['default'].isFunction(suiteOptions)) {
+    done = suiteOptions;
+    suiteOptions = null;
+  }
+
+  suiteOptions = suiteOptions || {};
+
+  var cycleTasks = _lodash2['default'].fill(new Array(times), function () {
+    return new _bluebird2['default'](function (resolve, reject) {
+      _inject(suiteOptions, 'onComplete', resolve);
+      ybm.suite(suite, suiteOptions);
+    });
+  });
+
+  _bluebird2['default'].reduce(cycleTasks, function (total, task) {
+    if (times > 1) _ylog2['default'].log('\t============= CYCLE ' + total + ' =============');
+    return task().then(function () {
+      return total + 1;
+    });
+  }, 1).then(done);
+};
+
+/**
+ *
  * @param {Array} rows
  * @param {Function} createSuite
+ * @param {Function} [done]
  */
-ybm.matrix = function (rows, createSuite) {
-  rows = rows.map(function (row) {
+ybm.matrix = function (rows, createSuite, done) {
+  var matrixTasks = rows.map(function (row) {
     return function () {
       return new _bluebird2['default'](function (resolve) {
 
@@ -230,32 +263,20 @@ ybm.matrix = function (rows, createSuite) {
             cycleTasks = undefined;
 
         suite = createSuite(row);
-        suiteOptions = suite.options || row.suiteOptions || {};
+        suiteOptions = suite.options || suite.suiteOptions || row.suiteOptions || {};
         cycle = suite.cycle || row.cycle || 1;
         suite = suite.suite || suite;
 
         cycle = _lodash2['default'].isNumber(cycle) && cycle > 0 ? cycle : 1;
 
-        cycleTasks = _lodash2['default'].fill(new Array(cycle), function () {
-          return new _bluebird2['default'](function (resolve, reject) {
-            _inject(suiteOptions, 'onComplete', resolve);
-            ybm.suite(suite, suiteOptions);
-          });
-        });
-
-        _bluebird2['default'].reduce(cycleTasks, function (total, task) {
-          if (cycle > 1) _ylog2['default'].log('\t============= CYCLE ' + total + ' =============');
-          return task().then(function () {
-            return total + 1;
-          });
-        }, 1).then(resolve);
+        ybm.cycle(cycle, suite, suiteOptions, resolve);
       });
     };
   });
 
-  _bluebird2['default'].reduce(rows, function (t, row) {
-    return row();
-  }, 0);
+  _bluebird2['default'].reduce(matrixTasks, function (t, task) {
+    return task();
+  }, 0).then(done);
 };
 
 ybm.config = _ybmHistoryJs2['default'].config;

@@ -44,10 +44,10 @@ function run() {
   running = true;
   count++;
 
-  ylog.title('YBM #' + count).log('...');
+  ylog.title('YBM #' + count).log('...').ln();
   var ps = spawn('node', program.args, { stdio: 'inherit' });
   ps.on('close', function() {
-    ylog.ln(2);
+    ylog.ln();
     running = false;
     if (waiting) {
       run();

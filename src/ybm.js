@@ -182,13 +182,47 @@ ybm.suite = function(bmTests, runOptions) {
   suite.run(_.omit(runOptions, ['historyOptions', 'watchOptions']));
 };
 
+
+/**
+ *
+ * Cycle running some test suite. 
+ *
+ * @param {Number} times
+ * @param {Array|Object} suite
+ * @param {Object} [suiteOptions]
+ * @param {Function} [done]
+ */
+ybm.cycle = function (times, suite, suiteOptions, done) {
+  if (_.isFunction(suiteOptions)) {
+    done = suiteOptions;
+    suiteOptions = null;
+  }
+
+  suiteOptions = suiteOptions || {};
+
+  let cycleTasks = _.fill(new Array(times), function() {
+    return new Bluebird(function (resolve, reject) {
+      _inject(suiteOptions, 'onComplete', resolve);
+      ybm.suite(suite, suiteOptions);
+    });
+  });
+
+  Bluebird
+    .reduce(cycleTasks, function (total, task) {
+      if (times > 1) ylog.log('\t============= CYCLE ' + total + ' =============');
+      return task().then(function() { return total + 1; });
+    }, 1)
+    .then(done);
+}
+
 /**
  *
  * @param {Array} rows
  * @param {Function} createSuite
+ * @param {Function} [done]
  */
-ybm.matrix = function (rows, createSuite) {
-  rows = rows.map(function(row) {
+ybm.matrix = function (rows, createSuite, done) {
+  let matrixTasks = rows.map(function(row) {
     return function() {
       return new Bluebird(function(resolve) {
 
@@ -197,31 +231,19 @@ ybm.matrix = function (rows, createSuite) {
         let suite, suiteOptions, cycle, cycleTasks;
 
         suite = createSuite(row);
-        suiteOptions = suite.options || row.suiteOptions || {};
+        suiteOptions = suite.options || suite.suiteOptions || row.suiteOptions || {};
         cycle = suite.cycle || row.cycle || 1;
         suite = suite.suite || suite;
 
         cycle = _.isNumber(cycle) && cycle > 0 ? cycle : 1;
 
+        ybm.cycle(cycle, suite, suiteOptions, resolve);
 
-        cycleTasks = _.fill(new Array(cycle), function() {
-          return new Bluebird(function (resolve, reject) {
-            _inject(suiteOptions, 'onComplete', resolve);
-            ybm.suite(suite, suiteOptions);
-          });
-        });
-
-        Bluebird
-          .reduce(cycleTasks, function (total, task) {
-            if (cycle > 1) ylog.log('\t============= CYCLE ' + total + ' =============');
-            return task().then(function() { return total + 1; });
-          }, 1)
-          .then(resolve);
       });
     };
   });
 
-  Bluebird.reduce(rows, function(t, row) { return row(); }, 0);
+  Bluebird.reduce(matrixTasks, function(t, task) { return task(); }, 0).then(done);
 };
 
 ybm.config = YbmHistory.config;

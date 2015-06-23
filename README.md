@@ -68,7 +68,17 @@ npm install --save ybm
   });  
   ```
 
-* Matrix test:
+* Cycle tests:
+
+  ```js
+  ybm.cycle(5, {
+    'test_1': function() { /* do task */ },
+    'test_2': function() { /* do task */ },
+    'test_3': function() { /* do task */ }
+  });
+  ```  
+
+* Matrix tests:
 
   ```js
   var matrix = [
@@ -86,13 +96,19 @@ npm install --save ybm
 
 * More Examples:
 
-  - [Single benchmark test](./examples/single.ybm.js)
-  - [Single async benchmark test](./examples/single-async.ybm.js)
-  - [Array suite benchmark tests](./examples/suite-array.ybm.js)
-  - [Array suite async benchmark tests](./examples/suite-array-async.ybm.js)
-  - [Object suite benchmark tests](./examples/suite-object.ybm.js)
-  - [Matrix suite benchmark tests](./examples/matrix-suite.ybm.js)
+  - [Single benchmark test](./examples/single.js)
+  - [Single async benchmark test](./examples/single-async.js)
+  - [Array suite benchmark tests](./examples/suite-array.js)
+  - [Array suite async benchmark tests](./examples/suite-array-async.js)
+  - [Object suite benchmark tests](./examples/suite-object.js)
+  - [Cycle suite benchmark tests](./examples/cycle-suite.js)
+  - [Matrix suite benchmark tests](./examples/matrix-suite.js)
 
+
+## TODO
+
+- [x] Add `ybm.cycle`
+- [ ] Support `nvm` to switch node test
 
 
 ## Contributing

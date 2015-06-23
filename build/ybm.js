@@ -173,10 +173,10 @@ ybm.suite = function (bmTests, runOptions) {
   suite = new _benchmark2['default'].Suite();
 
   _lodash2['default'].each(bmTests, function (bmTest, key, ref) {
-    if (isObject && !bmTest.name) bmTest.name = key;else if (isArray && !bmTest.id) bmTest.id = key + 1;
-
     bmTest = _toBenchObj(bmTest);
     ref[key] = bmTest;
+
+    if (isObject && !bmTest.name) bmTest.name = key;else if (isArray && !bmTest.id) bmTest.id = key + 1;
 
     suite.add(bmTest);
   });

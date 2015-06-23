@@ -150,11 +150,11 @@ ybm.suite = function(bmTests, runOptions) {
   suite = new Benchmark.Suite();
 
   _.each(bmTests, (bmTest, key, ref) => {
-    if (isObject && !bmTest.name) bmTest.name = key;
-    else if (isArray && !bmTest.id) bmTest.id = key + 1;
-
     bmTest = _toBenchObj(bmTest);
     ref[key] = bmTest;
+
+    if (isObject && !bmTest.name) bmTest.name = key;
+    else if (isArray && !bmTest.id) bmTest.id = key + 1;
 
     suite.add(bmTest);
   });

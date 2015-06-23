@@ -16,7 +16,7 @@ Your benchmark.
 ### Install
 
 ```bash
-npm install -global ybm
+npm install --global ybm
 ```
 
 ### Usage
@@ -44,7 +44,7 @@ npm install --save ybm
 
 * Single test:
 
-  ```
+  ```js
   ybm(function() {
     // do task
   });
@@ -52,7 +52,7 @@ npm install --save ybm
 
 * Async test:
 
-  ```
+  ```js
   ybm(function(done) {
     setTimeout(done, 100);
   });
@@ -60,20 +60,21 @@ npm install --save ybm
 
 * Suite tests:
 
-  ```
-  ybm.suite(
-    {
-      'test_1': function() { /* do task */ },
-      'test_2': function() { /* do task */ },
-      'test_3': function() { /* do task */ }
-    }
+  ```js
+  ybm.suite({
+    'test_1': function() { /* do task */ },
+    'test_2': function() { /* do task */ },
+    'test_3': function() { /* do task */ }
+  });  
   ```
 
-[Single benchmark test](./examples/single.ybm.js)
-[Single async benchmark test](./examples/single-async.ybm.js)
-[Array suite benchmark tests](./examples/suite-array.ybm.js)
-[Array suite async benchmark tests](./examples/suite-array-async.ybm.js)
-[Object suite benchmark tests](./examples/suite-object.ybm.js)
+* More Examples:
+
+  - [Single benchmark test](./examples/single.ybm.js)
+  - [Single async benchmark test](./examples/single-async.ybm.js)
+  - [Array suite benchmark tests](./examples/suite-array.ybm.js)
+  - [Array suite async benchmark tests](./examples/suite-array-async.ybm.js)
+  - [Object suite benchmark tests](./examples/suite-object.ybm.js)
 
 
 

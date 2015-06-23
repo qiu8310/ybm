@@ -60,6 +60,8 @@ function filter(list, type) {
   return target;
 }
 
+var Config = { baseDir: process.cwd(), dir: 'ybm-history' };
+
 var YbmHistory = (function () {
   function YbmHistory(options, bmTest, isSuite) {
     _classCallCheck(this, YbmHistory);
@@ -73,14 +75,16 @@ var YbmHistory = (function () {
     this._dumpEnv = options.dumpEnv !== false;
 
     if (this.enabled) {
-      var baseDir = options.baseDir;
-      var dir = options.dir;
-      var file = options.file;
+      var _$assign = _lodash2['default'].assign({}, Config, options);
+
+      var baseDir = _$assign.baseDir;
+      var dir = _$assign.dir;
+      var file = _$assign.file;
 
       var hash = md5(JSON.stringify(bmTest) + this.isSuite);
 
       file = file.replace(/(?:\.json)?$/, '.json');
-      dir = _path2['default'].join(baseDir || process.cwd(), dir || 'ybm-history');
+      dir = _path2['default'].join(baseDir, dir);
       file = _path2['default'].join(dir, file);
 
       this.path = file;
@@ -231,6 +235,13 @@ var YbmHistory = (function () {
       return this._complete(_lodash2['default'].map(benchs, function (bench) {
         return _this3.getBenchData(bench);
       }));
+    }
+  }], [{
+    key: 'config',
+    value: function config(key, val) {
+      if (key in Config) {
+        Config[key] = val;
+      }
     }
   }]);
 

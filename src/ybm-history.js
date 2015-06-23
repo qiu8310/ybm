@@ -28,7 +28,15 @@ function filter(list, type) {
   return target;
 }
 
+let Config = { baseDir: process.cwd(), dir: 'ybm-history' };
+
 export default class YbmHistory {
+
+  static config (key, val) {
+    if (key in Config) {
+      Config[key] = val;
+    }
+  }
 
   constructor (options, bmTest, isSuite) {
 
@@ -41,11 +49,11 @@ export default class YbmHistory {
     this._dumpEnv = options.dumpEnv !== false;
 
     if (this.enabled) {
-      let {baseDir, dir, file} = options;
+      let {baseDir, dir, file} = _.assign({}, Config, options);
       let hash = md5(JSON.stringify(bmTest) + this.isSuite);
 
       file = file.replace(/(?:\.json)?$/, '.json');
-      dir = path.join(baseDir || process.cwd(), dir || 'ybm-history');
+      dir = path.join(baseDir, dir);
       file = path.join(dir, file);
 
       this.path = file;

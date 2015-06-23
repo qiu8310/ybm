@@ -224,6 +224,7 @@ ybm.matrix = function (rows, createSuite) {
   Bluebird.reduce(rows, function(t, row) { return row(); }, 0);
 };
 
+ybm.config = YbmHistory.config;
 
 export default ybm;
 

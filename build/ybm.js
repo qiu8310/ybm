@@ -258,5 +258,7 @@ ybm.matrix = function (rows, createSuite) {
   }, 0);
 };
 
+ybm.config = _ybmHistoryJs2['default'].config;
+
 exports['default'] = ybm;
 module.exports = exports['default'];

@@ -185,7 +185,7 @@ ybm.suite = function(bmTests, runOptions) {
 
 /**
  *
- * Cycle running some test suite. 
+ * Cycle running some test suite.
  *
  * @param {Number} times
  * @param {Array|Object} suite
@@ -213,7 +213,7 @@ ybm.cycle = function (times, suite, suiteOptions, done) {
       return task().then(function() { return total + 1; });
     }, 1)
     .then(done);
-}
+};
 
 /**
  *
@@ -228,7 +228,7 @@ ybm.matrix = function (rows, createSuite, done) {
 
         ylog.ln.ln.writeFlag(row, '# MATRIX').ln();
 
-        let suite, suiteOptions, cycle, cycleTasks;
+        let suite, suiteOptions, cycle;
 
         suite = createSuite(row);
         suiteOptions = suite.options || suite.suiteOptions || row.suiteOptions || {};

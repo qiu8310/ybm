@@ -214,7 +214,7 @@ ybm.suite = function (bmTests, runOptions) {
 
 /**
  *
- * Cycle running some test suite. 
+ * Cycle running some test suite.
  *
  * @param {Number} times
  * @param {Array|Object} suite
@@ -259,8 +259,7 @@ ybm.matrix = function (rows, createSuite, done) {
 
         var suite = undefined,
             suiteOptions = undefined,
-            cycle = undefined,
-            cycleTasks = undefined;
+            cycle = undefined;
 
         suite = createSuite(row);
         suiteOptions = suite.options || suite.suiteOptions || row.suiteOptions || {};

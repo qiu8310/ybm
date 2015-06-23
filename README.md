@@ -68,7 +68,7 @@ npm install --save ybm
   });  
   ```
 
-* Cycle tests:
+* Cycle suite tests:
 
   ```js
   ybm.cycle(5, {
@@ -78,7 +78,7 @@ npm install --save ybm
   });
   ```  
 
-* Matrix tests:
+* Matrix suite tests:
 
   ```js
   var matrix = [

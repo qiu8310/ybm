@@ -22,9 +22,17 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
+var _ylog = require('ylog');
+
+var _ylog2 = _interopRequireDefault(_ylog);
+
 var _assert = require('assert');
 
 var _assert2 = _interopRequireDefault(_assert);
+
+var _bluebird = require('bluebird');
+
+var _bluebird2 = _interopRequireDefault(_bluebird);
 
 var _ybmHistoryJs = require('./ybm-history.js');
 
@@ -155,7 +163,7 @@ function ybm(bmTest, runOptions) {
 
 /**
  *
- * @param {Array.<YbmTest>} bmTests
+ * @param {Array.<YbmTest>|Object} bmTests
  * @param {Object} runOptions - 类似于 ybm 函数的 runOptions 选项，
  *  只比它多了一些事件监听的函数，如：onCycle, onComplete, onError 等
  *
@@ -202,6 +210,52 @@ ybm.suite = function (bmTests, runOptions) {
   });
 
   suite.run(_lodash2['default'].omit(runOptions, ['historyOptions', 'watchOptions']));
+};
+
+/**
+ *
+ * @param {Array} rows
+ * @param {Function} createSuite
+ */
+ybm.matrix = function (rows, createSuite) {
+  rows = rows.map(function (row) {
+    return function () {
+      return new _bluebird2['default'](function (resolve) {
+
+        _ylog2['default'].ln.ln.writeFlag(row, '# MATRIX').ln();
+
+        var suite = undefined,
+            suiteOptions = undefined,
+            cycle = undefined,
+            cycleTasks = undefined;
+
+        suite = createSuite(row);
+        suiteOptions = suite.options || row.suiteOptions || {};
+        cycle = suite.cycle || row.cycle || 1;
+        suite = suite.suite || suite;
+
+        cycle = _lodash2['default'].isNumber(cycle) && cycle > 0 ? cycle : 1;
+
+        cycleTasks = _lodash2['default'].fill(new Array(cycle), function () {
+          return new _bluebird2['default'](function (resolve, reject) {
+            _inject(suiteOptions, 'onComplete', resolve);
+            ybm.suite(suite, suiteOptions);
+          });
+        });
+
+        _bluebird2['default'].reduce(cycleTasks, function (total, task) {
+          if (cycle > 1) _ylog2['default'].log('\t============= CYCLE ' + total + ' =============');
+          return task().then(function () {
+            return total + 1;
+          });
+        }, 1).then(resolve);
+      });
+    };
+  });
+
+  _bluebird2['default'].reduce(rows, function (t, row) {
+    return row();
+  }, 0);
 };
 
 exports['default'] = ybm;

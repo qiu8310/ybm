@@ -68,6 +68,22 @@ npm install --save ybm
   });  
   ```
 
+* Matrix test:
+
+  ```js
+  var matrix = [
+    row1,
+    row2,
+    //...
+  ];
+  
+  ybm.matrix(matrix, function(row) {
+    // create suite according row
+    return suite;
+  })
+  ```
+  
+
 * More Examples:
 
   - [Single benchmark test](./examples/single.ybm.js)
@@ -75,6 +91,7 @@ npm install --save ybm
   - [Array suite benchmark tests](./examples/suite-array.ybm.js)
   - [Array suite async benchmark tests](./examples/suite-array-async.ybm.js)
   - [Object suite benchmark tests](./examples/suite-object.ybm.js)
+  - [Matrix suite benchmark tests](./examples/matrix-suite.ybm.js)
 
 
 

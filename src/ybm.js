@@ -8,7 +8,9 @@
 
 import Benchmark from 'benchmark';
 import _ from 'lodash';
+import ylog from 'ylog';
 import assert from 'assert';
+import Bluebird from 'bluebird';
 
 
 import YbmHistory from './ybm-history.js';
@@ -136,7 +138,7 @@ function ybm(bmTest, runOptions) {
 
 /**
  *
- * @param {Array.<YbmTest>} bmTests
+ * @param {Array.<YbmTest>|Object} bmTests
  * @param {Object} runOptions - 类似于 ybm 函数的 runOptions 选项，
  *  只比它多了一些事件监听的函数，如：onCycle, onComplete, onError 等
  *
@@ -178,6 +180,48 @@ ybm.suite = function(bmTests, runOptions) {
   });
 
   suite.run(_.omit(runOptions, ['historyOptions', 'watchOptions']));
+};
+
+/**
+ *
+ * @param {Array} rows
+ * @param {Function} createSuite
+ */
+ybm.matrix = function (rows, createSuite) {
+  rows = rows.map(function(row) {
+    return function() {
+      return new Bluebird(function(resolve) {
+
+        ylog.ln.ln.writeFlag(row, '# MATRIX').ln();
+
+        let suite, suiteOptions, cycle, cycleTasks;
+
+        suite = createSuite(row);
+        suiteOptions = suite.options || row.suiteOptions || {};
+        cycle = suite.cycle || row.cycle || 1;
+        suite = suite.suite || suite;
+
+        cycle = _.isNumber(cycle) && cycle > 0 ? cycle : 1;
+
+
+        cycleTasks = _.fill(new Array(cycle), function() {
+          return new Bluebird(function (resolve, reject) {
+            _inject(suiteOptions, 'onComplete', resolve);
+            ybm.suite(suite, suiteOptions);
+          });
+        });
+
+        Bluebird
+          .reduce(cycleTasks, function (total, task) {
+            if (cycle > 1) ylog.log('\t============= CYCLE ' + total + ' =============');
+            return task().then(function() { return total + 1; });
+          }, 1)
+          .then(resolve);
+      });
+    };
+  });
+
+  Bluebird.reduce(rows, function(t, row) { return row(); }, 0);
 };
 
 

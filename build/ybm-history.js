@@ -124,8 +124,7 @@ var YbmHistory = (function () {
       var mean = _ref.mean;
 
       md = md != null ? md : item === fastest ? '&' : item === slowest ? '#' : '';
-      var time = (0, _humanTime2['default'])(new Date(item.time)),
-          tpl = undefined;
+      var tpl = undefined;
       if (item.error) {
         tpl = '__' + item.name + '__ #' + item.error + '#';
       } else {
@@ -133,7 +132,9 @@ var YbmHistory = (function () {
         var dl = Math.abs(diff).toFixed(2) + '% ' + (diff > 0 ? 'faster' : diff < 0 ? 'slower' : '');
         dl = fastest ? ' (' + dl + ')' : '';
 
-        tpl = '__' + item.name + '__ ' + md + item.ops + ' ' + item.rate + dl + md + ' *(' + item.sample + ' at ' + time + ')*';
+        var time = this.enabled ? ' at ' + (0, _humanTime2['default'])(new Date(item.time)) : '';
+
+        tpl = '__' + item.name + '__ ' + md + item.ops + ' ' + item.rate + dl + md + ' *(' + item.sample + time + ')*';
       }
       _ylog2['default'].log(tpl);
     }

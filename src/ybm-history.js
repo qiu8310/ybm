@@ -85,7 +85,7 @@ export default class YbmHistory {
     let {fastest, slowest, md, mean} = options || {};
 
     md = md != null ? md : item === fastest ? '&' : item === slowest ? '#' : '';
-    let time = hm(new Date(item.time)), tpl;
+    let tpl;
     if (item.error) {
       tpl = `__${item.name}__ #${item.error}#`;
     } else {
@@ -93,7 +93,9 @@ export default class YbmHistory {
       let dl = Math.abs(diff).toFixed(2) + '% ' + (diff > 0 ? 'faster' : diff < 0 ? 'slower' : '');
       dl = fastest ? ' (' + dl + ')' : '';
 
-      tpl = `__${item.name}__ ${md}${item.ops} ${item.rate}${dl}${md} *(${item.sample} at ${time})*`;
+      let time = this.enabled ? ' at ' + hm(new Date(item.time)) : '';
+
+      tpl = `__${item.name}__ ${md}${item.ops} ${item.rate}${dl}${md} *(${item.sample}${time})*`;
     }
     ylog.log(tpl);
   }

@@ -1,0 +1,29 @@
+{
+  "esnext": true,
+  "node": true,
+  "browser": true,
+  "bitwise": true,
+  "camelcase": false,
+  "curly": false,
+  "eqeqeq": true,
+  "eqnull": true,
+  "immed": true,
+  "latedef": "nofunc",
+  "newcap": true,
+  "noarg": true,
+  "quotmark": "single",
+  "undef": true,
+  "unused": "vars",
+  "strict": false,
+  "trailing": true,
+  "smarttabs": true,
+  "maxlen": 120,
+  "globals": {
+    "describe"   : false,
+    "it"         : false,
+    "before"     : false,
+    "beforeEach" : false,
+    "after"      : false,
+    "afterEach"  : false
+  }
+}

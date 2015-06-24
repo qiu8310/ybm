@@ -45,7 +45,7 @@ if (program.args.length < 1) { program.help(); process.exit(0); }
 program.args[0] = path.resolve(program.args[0]); // 获取绝对路径
 
 var benchFile = program.args[0];
-var running = false, waiting = false, count = 0, cycle = program.cycle || 1;
+var running = false, waiting = false, count = 0;
 
 function run(done) {
   if (running) { waiting = true; return false; }
@@ -65,19 +65,6 @@ function run(done) {
   });
 }
 
-if (cycle >= 2) {
-  run = function () {
-    Bluebird.reduce(
-      _.fill(new Array(cycle), run),
-      function(_, task) {
-        return new Bluebird(function(resolve) {
-          task(resolve);
-        });
-      },
-      0
-    );
-  }
-}
 
 if ( enabled('nvm') ) {
   function nvm(type, cb) {
@@ -140,8 +127,24 @@ if ( enabled('nvm') ) {
     });
   }
 
-  run();
+  var exec = run,
+    cycle = program.cycle || 1;
 
+  if (cycle >= 2) {
+    exec = function () {
+      Bluebird.reduce(
+        _.fill(new Array(cycle), run),
+        function(_, task) {
+          return new Bluebird(function(resolve) {
+            task(resolve);
+          });
+        },
+        0
+      );
+    };
+  }
+
+  exec();
 }
 
 

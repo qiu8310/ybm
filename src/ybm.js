@@ -209,7 +209,7 @@ ybm.cycle = function (times, suite, suiteOptions, done) {
 
   Bluebird
     .reduce(cycleTasks, function (total, task) {
-      if (times > 1) ylog.log('\t============= CYCLE ' + total + ' =============');
+      if (times > 1) ylog.ln(total > 1).log('\t============= CYCLE ' + total + ' =============');
       return task().then(function() { return total + 1; });
     }, 1)
     .then(done);
@@ -222,11 +222,11 @@ ybm.cycle = function (times, suite, suiteOptions, done) {
  * @param {Function} [done]
  */
 ybm.matrix = function (rows, createSuite, done) {
-  let matrixTasks = rows.map(function(row) {
+  let matrixTasks = rows.map(function(row, index) {
     return function() {
       return new Bluebird(function(resolve) {
-
-        ylog.ln.ln.writeFlag(row, '# MATRIX').ln();
+        ylog.ln(index && 2).log(_.repeat('-', 60));
+        ylog.writeFlag(row, '# MATRIX').ln();
 
         let suite, suiteOptions, cycle;
 

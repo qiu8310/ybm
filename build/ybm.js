@@ -237,7 +237,7 @@ ybm.cycle = function (times, suite, suiteOptions, done) {
   });
 
   _bluebird2['default'].reduce(cycleTasks, function (total, task) {
-    if (times > 1) _ylog2['default'].log('\t============= CYCLE ' + total + ' =============');
+    if (times > 1) _ylog2['default'].ln(total > 1).log('\t============= CYCLE ' + total + ' =============');
     return task().then(function () {
       return total + 1;
     });
@@ -251,11 +251,11 @@ ybm.cycle = function (times, suite, suiteOptions, done) {
  * @param {Function} [done]
  */
 ybm.matrix = function (rows, createSuite, done) {
-  var matrixTasks = rows.map(function (row) {
+  var matrixTasks = rows.map(function (row, index) {
     return function () {
       return new _bluebird2['default'](function (resolve) {
-
-        _ylog2['default'].ln.ln.writeFlag(row, '# MATRIX').ln();
+        _ylog2['default'].ln(index && 2).log(_lodash2['default'].repeat('-', 60));
+        _ylog2['default'].writeFlag(row, '# MATRIX').ln();
 
         var suite = undefined,
             suiteOptions = undefined,

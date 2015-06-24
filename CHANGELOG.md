@@ -1,4 +1,10 @@
 
+0.0.5 / 2015-06-24
+==================
+
+  * Support Node Version Manager
+  * Reformat cycle and matrix output message.
+
 0.0.4 / 2015-06-24
 ==================
 

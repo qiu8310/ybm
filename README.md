@@ -46,7 +46,7 @@ npm install --global ybm
   ```
 
   Run `some-benchmark-file` on `iojs-v1.0.4` and `iojs-v2.0.0`
-  
+
 
 __Using `ybm -h` to see more help.__
 
@@ -127,8 +127,8 @@ npm install --save ybm
 
 ## TODO
 
-- [x] Add `ybm.cycle`
-- [x] Support `nvm` to switch node test
+- [x] Add `ybm.cycle` - 2015/06/23
+- [x] Support `nvm` to switch node test - 2015/06/24
 
 
 ## Contributing

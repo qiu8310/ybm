@@ -110,7 +110,7 @@ if ( enabled('nvm') ) {
     
     // nvm use xx && node file args && nvm use xx ...
     var command = _.map(versions, function(v) {
-      var logo = ' USE ' + v + ' ', len = 60, row = _.repeat('=', len), rtn = [];
+      var logo = ' USING ' + v + ' ', len = 60, row = _.repeat('=', len), rtn = [];
       len = len - logo.length;
       var r = Math.round(len / 2), l = (len % 2) ? r - 1 : r;
       rtn.push('. $NVM_DIR/nvm.sh')

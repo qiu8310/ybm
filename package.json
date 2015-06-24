@@ -1,7 +1,7 @@
 {
   "name": "ybm",
   "description": "Your benchmark.",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "homepage": "https://github.com/qiu8310/ybm",
   "bugs": "https://github.com/qiu8310/ybm/issues",
   "license": "MIT",
@@ -29,7 +29,7 @@
     "gaze": "^0.5.1",
     "human-time": "0.0.1",
     "lodash": "3.9.3",
-    "ylog": "0.2.1"
+    "ylog": "0.2.2"
   },
   "devDependencies": {
     "gulp": "^3.8.8",

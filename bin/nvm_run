@@ -1,1 +1,0 @@
-. $NVM_DIR/nvm.sh && echo && echo ============================================================ && echo "===================== USE iojs-v1.0.4 ======================" && echo ============================================================ && echo && nvm use iojs-v1.0.4 && node /Users/Mora/Workspace/node/ybm/examples/single-async.js && echo && echo && nvm use iojs-v2.2.1

@@ -46,7 +46,7 @@ export default class YbmHistory {
     this.enabled = !!(options.record !== false && options.file);
     this.length = parseInt(options.length, 10) || 10;
     this._dump = options.dump !== false;
-    this._dumpEnv = options.dumpEnv !== false;
+    this._dumpEnv = options.dumpEnv;
 
     if (this.enabled) {
       let {baseDir, dir, file} = _.assign({}, Config, options);

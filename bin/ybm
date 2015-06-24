@@ -1,0 +1,148 @@
+#!/usr/bin/env node
+
+/*
+  Useful resource:
+
+  http://bocoup.com/weblog/building-command-line-tools-in-node-with-liftoff/
+
+  optimist, minimist, yargs, nomnom, nopt, commander
+
+
+  http://blog.npmjs.org/post/118810260230/building-a-simple-command-line-tool-with-npm
+  http://blog.npmjs.org/post/119317128765/adding-subcommands-to-your-command-line-tool
+  http://blog.npmjs.org/post/119377806820/making-your-command-line-tool-configurable
+
+*/
+
+
+var ybm = require('../');
+var program = require('commander');
+var Bluebird = require('bluebird');
+var _ = require('lodash');
+var gaze = require('gaze');
+var ylog = require('ylog');
+var fs = require('fs-extra');
+var path = require('path');
+var spawn = require('cross-spawn');
+var pkg = require('../package.json');
+
+
+function collect(val, container) { container.push(val); return container; }
+function enabled(key) { return _.includes(program.rawArgs, '--' + key) || _.includes(program.rawArgs, '-' + key.charAt(0)); }
+
+program
+  .version(pkg.version)
+  .usage('[options] <benchFile> [arguments]')
+  .description('Continuous integration benchmark test.')
+  .option('-w, --watch [pattern]', 'file patterns which updated will trigger re-benchmark', collect, [])
+  .option('-n, --nvm [rules]', 'nvm versions which you want your benchmark run', collect, [])
+  .option('-c, --cycle <count>', 'repeat run your benchmark `count` times', parseInt)
+  .parse(process.argv);
+
+if (program.args.length < 1) { program.help(); process.exit(0); }
+
+
+program.args[0] = path.resolve(program.args[0]); // 获取绝对路径
+
+var benchFile = program.args[0];
+var running = false, waiting = false, count = 0, cycle = program.cycle || 1;
+
+function run(done) {
+  if (running) { waiting = true; return false; }
+  running = true;
+  count++;
+
+  ylog.title('YBM #' + count).log('...').ln();
+  var ps = spawn('node', program.args, { stdio: 'inherit' });
+  ps.on('close', function() {
+    ylog.ln();
+    running = false;
+    if (done) done();
+    if (waiting) {
+      run();
+      waiting = false;
+    }
+  });
+}
+
+if (cycle >= 2) {
+  run = function () {
+    Bluebird.reduce(
+      _.fill(new Array(cycle), run),
+      function(_, task) {
+        return new Bluebird(function(resolve) {
+          task(resolve);
+        });
+      },
+      0
+    );
+  }
+}
+
+if ( enabled('nvm') ) {
+  function nvm(type, cb) {
+    var opts = cb ? {} : {stdio: 'inherit'};
+    var ps = spawn('sh', [__dirname + '/nvm_' + type], opts);
+    if (cb) {
+      var output = '';
+      ps.stdout.on('data', function (data) { output += data.toString(); });
+      ps.stderr.on('data', function (data) { ylog.log(data.toString()); });
+      ps.on('close', function(code) { if (code === 0) { cb(output); } });
+    }
+  }
+
+  nvm('ls', function(output) {
+    var versions, current, nvms = program.nvm;
+    versions = output.trim().split(/[\r]?\n/);
+    current = versions.shift();
+
+    nvms = _.flatten(_.map(nvms, function(v) { return v.split(/\s+|\s*,\s*/); }));    
+
+    // 过滤出用户指定的版本
+    if (nvms.length) {
+      var includeMode = _.some(nvms, function(v) { return v.indexOf('-') !== 0; });
+      versions = _.filter(versions, function(v) {
+        if (_.includes(nvms, '-' + v)) return false;
+        if (!includeMode) return true;
+        return _.includes(nvms, v) || _.includes(nvms, '+' + v);
+      });
+    }
+    
+    // nvm use xx && node file args && nvm use xx ...
+    var command = _.map(versions, function(v) {
+      var logo = ' USE ' + v + ' ', len = 60, row = _.repeat('=', len), rtn = [];
+      len = len - logo.length;
+      var r = Math.round(len / 2), l = (len % 2) ? r - 1 : r;
+      rtn.push('. $NVM_DIR/nvm.sh')
+      rtn.push('echo', 'echo ' + row)
+      rtn.push('echo "' + _.repeat('=', l) + logo + _.repeat('=', r) + '"');
+      rtn.push('echo ' + row, 'echo');
+      rtn.push('nvm use ' + v, 'node ' + program.args.join(' '));
+      rtn.push('echo', 'echo');
+      return rtn.join(' && ');
+    }).concat('nvm use ' + current).join(' && ');
+
+    fs.writeFileSync(__dirname + '/nvm_run', command);
+
+    nvm('run');
+  });
+
+} else {
+
+  if ( enabled('watch') ) {
+    var watches = program.watch;
+    gaze(watches.concat(benchFile), function() {
+      var update = _.throttle(function() {
+        run();
+      }, 500);
+      this.on('changed', update);
+      this.on('added', update);
+    });
+  }
+
+  run();
+
+}
+
+
+

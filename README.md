@@ -21,12 +21,32 @@ npm install --global ybm
 
 ### Usage
 
-```bash
-ybm some-benchmark-file
-```
 
-when `some-benchmark-file` updated, will trigger re-benchmark this file.
+* Watch
 
+  ```bash
+  ybm --watch some-benchmark-file
+  ```
+
+  When `some-benchmark-file` updated, will trigger re-benchmark this file.
+
+
+* Cycle
+
+  ```bash
+  ybm --cycle 3 some-benchmark-file
+  ```
+
+  Run `some-benchmark-file` three times.
+
+* NVM - __switch node version to run your benchmark file__  
+
+  ```bash
+  ybm --nvm "iojs-v1.0.4, iojs-v2.0.0" some-benchmark-file
+  ```
+
+  Run `some-benchmark-file` on `iojs-v1.0.4` and `iojs-v2.0.0`
+  
 
 __Using `ybm -h` to see more help.__
 
@@ -108,7 +128,7 @@ npm install --save ybm
 ## TODO
 
 - [x] Add `ybm.cycle`
-- [ ] Support `nvm` to switch node test
+- [x] Support `nvm` to switch node test
 
 
 ## Contributing
